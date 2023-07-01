@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,6 +46,15 @@ public class FileServiceImpl implements FileService {
             Files.copy(file.getInputStream(), Path.of(targetPath));
 
             return new FileUploadResponse(filename, null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public byte[] getFile(String filename) {
+        try (var file = new FileInputStream(new File(Path.of(uploadPath, filename).toUri()))) {
+            return file.readAllBytes();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
